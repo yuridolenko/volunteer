@@ -6,7 +6,6 @@ from setup_logger import logger
 
 
 class Bot:
-    words = WordsGame()
 
     def start(self):
         updater = Updater(config("TOKEN"))
