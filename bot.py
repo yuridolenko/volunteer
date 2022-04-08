@@ -3,9 +3,14 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 
 from decouple import config
 from setup_logger import logger
+from worker import Worker
 
 
 class Bot:
+
+    worker = Worker()
+
+    chatIds = []
 
     def start(self):
         updater = Updater(config("TOKEN"))
@@ -20,6 +25,8 @@ class Bot:
 
         updater.start_polling()
 
+        self.worker.start(updater.bot, self.chatIds)
+
         # Run the bot until you press Ctrl-C or the process receives SIGINT,
         # SIGTERM or SIGABRT. This should be used most of the time, since
         # start_polling() is non-blocking and will stop the bot gracefully.
@@ -33,6 +40,7 @@ class Bot:
     def greetings(self, update: Update, _: CallbackContext) -> None:
         user = update.effective_user
         update.message.reply_markdown_v2(
-            f'Hi {user.mention_markdown_v2()}',
+            f'Hi {user.mention_markdown_v2()} this is bot for volunteers, you will receive requests here\.',
             reply_markup=ForceReply(selective=True),
         )
+        self.chatIds.append(update.message.chat_id)
